@@ -1,9 +1,9 @@
 <?php
 
-namespace YourVendor\Raccomandate\Facades;
+namespace JustSolve\Raccomandate\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use YourVendor\Raccomandate\RaccomandateService;
+use JustSolve\Raccomandate\RaccomandateService;
 
 class Raccomandate extends Facade
 {

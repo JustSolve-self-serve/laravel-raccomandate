@@ -1,6 +1,6 @@
 <?php
 
-namespace YourVendor\Raccomandate;
+namespace JustSolve\Raccomandate;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -11,14 +11,13 @@ class RaccomandateService
     protected string $baseUri;
     protected ?string $apiKey;
 
-    public function __construct()
+    public function __construct(string $baseUri, ?string $apiKey)
     {
-        $this->baseUri = config('raccomandate.base_uri');
-        $this->apiKey  = config('raccomandate.api_key');
+        $this->baseUri = $baseUri;
+        $this->apiKey = $apiKey;
 
         $this->client = new Client([
             'base_uri' => $this->baseUri,
-            // Optional Guzzle config
             'timeout'  => 30.0,
         ]);
     }

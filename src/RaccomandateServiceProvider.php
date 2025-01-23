@@ -1,6 +1,6 @@
 <?php
 
-namespace YourVendor\Raccomandate;
+namespace JustSolve\Raccomandate;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -13,7 +13,7 @@ class RaccomandateServiceProvider extends ServiceProvider
 
         // Bind our service into the service container
         $this->app->singleton(RaccomandateService::class, function ($app) {
-            return new RaccomandateService();
+            return new RaccomandateService('https://fake-url.com', 'fake-api-key');
         });
     }
 
