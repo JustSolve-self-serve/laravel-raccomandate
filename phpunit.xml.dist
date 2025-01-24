@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>  <!-- TODO correggere questo file, portarlo a una versione compatibile -->
 <phpunit bootstrap="vendor/autoload.php">
     <testsuites>
         <testsuite name="Library Test Suite">

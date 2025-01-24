@@ -19,6 +19,7 @@ class RaccomandateService
         $this->client = new Client([
             'base_uri' => $this->baseUri,
             'timeout'  => 30.0,
+            'verify'   => false,
         ]);
     }
 
@@ -32,7 +33,7 @@ class RaccomandateService
             'Accept'       => 'application/json',
             'Content-Type' => 'application/json',
             // If your API key is a bearer token, you might do:
-            // 'Authorization' => 'Bearer ' . $this->apiKey,
+            'Authorization' => 'Bearer ' . $this->apiKey,
             // or if it is a custom header:
             // 'x-api-key' => $this->apiKey,
         ];
@@ -41,7 +42,7 @@ class RaccomandateService
     /**
      * List Raccomandate (GET /raccomandate).
      */
-    public function listRaccomandate(): array
+    public function listRaccomandate(): array | null
     {
         try {
             $response = $this->client->get('/raccomandate', [
