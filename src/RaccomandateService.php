@@ -11,10 +11,12 @@ class RaccomandateService
     protected string $baseUri;
     protected ?string $apiKey;
 
-    public function __construct(string $baseUri, ?string $apiKey)
+    public function __construct()
     {
-        $this->baseUri = $baseUri;
-        $this->apiKey = $apiKey;
+        $env = require __DIR__ . '/../config/raccomandate.php';
+
+        $this->baseUri = $env['base_uri'];
+        $this->apiKey = $env['api_key'];
 
         $this->client = new Client([
             'base_uri' => $this->baseUri,

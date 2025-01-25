@@ -7,7 +7,7 @@ class RaccomandateServiceTest extends TestCase
 {
     public function testListRaccomandate()
     {
-        $raccomandateService = new RaccomandateService('https://test.ws.ufficiopostale.com', '679381b8e784c9568800a621');
+        $raccomandateService = new RaccomandateService();
         $this->assertNull($raccomandateService->listRaccomandate());
     }
 }

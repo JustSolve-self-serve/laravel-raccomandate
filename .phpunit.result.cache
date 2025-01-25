@@ -1,1 +1,1 @@
-{"version":1,"defects":{"RaccomandateServiceTest::testAddition":8,"RaccomandateServiceTest::testListRaccomandate":7},"times":{"RaccomandateServiceTest::testAddition":0.048,"RaccomandateServiceTest::testListRaccomandate":1.429}}
+{"version":1,"defects":{"RaccomandateServiceTest::testAddition":8,"RaccomandateServiceTest::testListRaccomandate":8},"times":{"RaccomandateServiceTest::testAddition":0.048,"RaccomandateServiceTest::testListRaccomandate":0.589}}
