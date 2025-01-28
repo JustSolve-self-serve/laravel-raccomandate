@@ -1,3 +1,5 @@
-/vendor
+.env
+testbench.yaml
 .phpunit.result.cache
-/config/raccomandate.php
+vendor
+workbench

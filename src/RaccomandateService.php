@@ -4,6 +4,7 @@ namespace JustSolve\Raccomandate;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Config;
 
 class RaccomandateService
 {
@@ -13,10 +14,13 @@ class RaccomandateService
 
     public function __construct()
     {
-        $env = require __DIR__ . '/../config/raccomandate.php';
+        /*$env = require __DIR__ . '/../config/raccomandate.php';
 
         $this->baseUri = $env['base_uri'];
-        $this->apiKey = $env['api_key'];
+        $this->apiKey = $env['api_key'];*/
+
+        $this->baseUri = config('raccomandate.base_uri');
+        $this->apiKey = config('raccomandate.api_key');        
 
         $this->client = new Client([
             'base_uri' => $this->baseUri,
