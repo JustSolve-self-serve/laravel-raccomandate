@@ -1,5 +1,4 @@
 .env
 testbench.yaml
-.phpunit.result.cache
 vendor
 workbench
