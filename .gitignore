@@ -2,3 +2,4 @@
 testbench.yaml
 vendor
 workbench
+.phpunit.result.cache
