@@ -13,7 +13,7 @@ class RaccomandateServiceProvider extends ServiceProvider
 
         // Bind our service into the service container
         $this->app->singleton(RaccomandateService::class, function ($app) {
-            return new RaccomandateService('https://fake-url.com', 'fake-api-key');
+            return new RaccomandateService();
         });
     }
 

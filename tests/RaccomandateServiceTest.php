@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
-use JustSolve\Raccomandate\RaccomandateService; 
+use JustSolve\Raccomandate\Facades\Raccomandate;
 
 class RaccomandateServiceTest extends TestCase
 {
@@ -16,7 +16,6 @@ class RaccomandateServiceTest extends TestCase
 
     public function testListRaccomandate()
     {
-        $raccomandateService = new RaccomandateService();
-        $this->assertNull($raccomandateService->listRaccomandate());
+        $this->assertNull(Raccomandate::listRaccomandate());
     }
 }
