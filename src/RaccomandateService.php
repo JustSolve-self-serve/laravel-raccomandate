@@ -4,7 +4,6 @@ namespace JustSolve\Raccomandate;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Config;
 
 class RaccomandateService
 {
