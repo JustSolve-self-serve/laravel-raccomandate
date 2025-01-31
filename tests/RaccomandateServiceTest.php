@@ -30,9 +30,9 @@ class RaccomandateServiceTest extends TestCase
                 "dug": "Via",
                 "indirizzo": "Dante Alighieri",
                 "civico": "1",
-                "comune": "Roma",
-                "cap": "00118",
-                "provincia": "RM",
+                "comune": "Carpi",
+                "cap": "41012",
+                "provincia": "MO",
                 "nazione": "IT",
                 "email": "john.doe@openapi.it"
             }'
