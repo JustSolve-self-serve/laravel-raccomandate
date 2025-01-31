@@ -4,6 +4,8 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
 use JustSolve\Raccomandate\Facades\Raccomandate;
+use JustSolve\Raccomandate\Models\MittenteCompany;
+use JustSolve\Raccomandate\Models\MittentePersona;
 
 class RaccomandateServiceTest extends TestCase
 {
@@ -22,20 +24,16 @@ class RaccomandateServiceTest extends TestCase
 
     public function testCreateRaccomandata(): void
     {
-        $mittente = json_decode(
-            '{
-                "titolo": "mr",
-                "nome": "Roberto",
-                "cognome": "Iorio",
-                "dug": "Via",
-                "indirizzo": "Dante Alighieri",
-                "civico": "1",
-                "comune": "Carpi",
-                "cap": "41012",
-                "provincia": "MO",
-                "nazione": "IT",
-                "email": "john.doe@openapi.it"
-            }'
+        $mittente = new MittenteCompany(
+            "bububello s.r.l. di bubu bello",
+            "Via",
+            "Dante Alighieri",
+            "1",
+            "Carpi",
+            "41012",
+            "MO",
+            "IT",
+            "john.doe@openapi.it"
         );
 
         $dest1 = json_decode(
