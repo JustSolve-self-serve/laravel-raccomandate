@@ -93,16 +93,16 @@ class RaccomandateServiceTest extends TestCase
     {
         $data = self::$data;
         $response = Raccomandate::createRaccomandata($data);
-        $this->assertTrue($response['success'], 'createRaccomandata successful, id: ' . $response['data'][0]['id'] . '\n');
+        $this->assertTrue($response['success']);
     }
 
     public function testGetRaccomandata(): void
     {
-        $id = '679b593b664e13b51b02f63a';
-        $nullId = '679b593b664e13b51b02f63b';
+        $response = Raccomandate::createRaccomandata(self::$data);
+        $validId = $response['data'][0]['id'];
+        $this->assertTrue(Raccomandate::getRaccomandata($validId)['success']);
         
-        $this->assertNotNull(Raccomandate::getRaccomandata($id));
-
+        $nullId = $validId . 'bubba';
         $this->expectException(ClientException::class);
         Raccomandate::getRaccomandata($nullId);
     }
