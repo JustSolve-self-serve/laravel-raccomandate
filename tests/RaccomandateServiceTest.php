@@ -9,20 +9,9 @@ use JustSolve\Raccomandate\Models\MittentePersona;
 
 class RaccomandateServiceTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
+    private static array $data;
 
-        Config::set('raccomandate.base_uri', env('RACCOMANDATE_BASE_URI', 'baba'));
-        Config::set('raccomandate.api_key', env('RACCOMANDATE_API_KEY', 'bubu'));
-    }
-
-    public function testListRaccomandate(): void
-    {
-        $this->assertNotNull(Raccomandate::listRaccomandate());
-    }
-
-    public function testCreateRaccomandata(): void
+    public static function setupBeforeClass(): void
     {
         $mittente = new MittenteCompany(
             "bububello s.r.l. di bubu bello",
@@ -75,16 +64,34 @@ class RaccomandateServiceTest extends TestCase
                 "fronteretro": false,
                 "colori": false,
                 "ar": true,
-                "autoconfirm": true
+                "autoconfirm": false
             }'
         );
 
-        $data =[
+        self::$data = [
             'mittente' => $mittente,
             'destinatari' => $destinatari,
             'documento' => $documento,
             'opzioni' => $opzioni
         ];
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Config::set('raccomandate.base_uri', env('RACCOMANDATE_BASE_URI', 'baba'));
+        Config::set('raccomandate.api_key', env('RACCOMANDATE_API_KEY', 'bubu'));
+    }
+
+    public function testListRaccomandate(): void
+    {
+        $this->assertNotNull(Raccomandate::listRaccomandate());
+    }
+
+    public function testCreateRaccomandata(): void
+    {
+        $data = self::$data;
 
         $this->assertNotNull(Raccomandate::createRaccomandata($data));
     }
@@ -98,5 +105,10 @@ class RaccomandateServiceTest extends TestCase
 
         $this->expectException(ClientException::class);
         Raccomandate::getRaccomandata($nullId);
+    }
+
+    public function testConfirmRaccomandata(): void 
+    {
+
     }
 }
