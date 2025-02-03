@@ -109,6 +109,14 @@ class RaccomandateServiceTest extends TestCase
 
     public function testConfirmRaccomandata(): void 
     {
+        $response = Raccomandate::createRaccomandata(self::$data);
+        $this->assertFalse($response['data'][0]['confirmed']);
+        $this->assertNotEquals('CONFIRMED', $response['data'][0]['state']);
 
+        $validId = $response['data'][0]['id'];
+        $newResponse = Raccomandate::confirmRaccomandata($validId);
+        $this->assertTrue($newResponse['success']);
+        $this->assertTrue($newResponse['data'][0]['confirmed']);
+        $this->assertEquals('CONFIRMED', $newResponse['data'][0]['state']);
     }
 }
