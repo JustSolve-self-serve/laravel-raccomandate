@@ -92,8 +92,8 @@ class RaccomandateServiceTest extends TestCase
     public function testCreateRaccomandata(): void
     {
         $data = self::$data;
-
-        $this->assertNotNull(Raccomandate::createRaccomandata($data));
+        $response = Raccomandate::createRaccomandata($data);
+        $this->assertTrue($response['success'], 'createRaccomandata successful, id: ' . $response['data'][0]['id'] . '\n');
     }
 
     public function testGetRaccomandata(): void
