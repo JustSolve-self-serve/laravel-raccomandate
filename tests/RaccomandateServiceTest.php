@@ -78,10 +78,6 @@ class RaccomandateServiceTest extends TestCase
             'documento' => $documento,
             'opzioni' => $opzioni
         ];
-
-        self::$responseFile = new SplFileObject(__DIR__ . '/../response.json', 'w');
-        self::$accettazioneFile = new SplFileObject(__DIR__ . '/../accettazione.pdf', 'w');
-        self::$archiviazioneFile = new SplFileObject(__DIR__ . '/../archiviazione.pdf', 'w');
     }
 
     public function setUp(): void
@@ -90,6 +86,10 @@ class RaccomandateServiceTest extends TestCase
 
         Config::set('raccomandate.base_uri', env('RACCOMANDATE_BASE_URI', 'baba'));
         Config::set('raccomandate.api_key', env('RACCOMANDATE_API_KEY', 'bubu'));
+
+        self::$responseFile = new SplFileObject(__DIR__ . '/../response.json', 'w');
+        self::$accettazioneFile = new SplFileObject(__DIR__ . '/../accettazione.pdf', 'w');
+        self::$archiviazioneFile = new SplFileObject(__DIR__ . '/../archiviazione.pdf', 'w');
     }
 
     public function testListRaccomandate(): void
