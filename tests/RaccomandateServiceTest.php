@@ -13,6 +13,7 @@ class RaccomandateServiceTest extends TestCase
     private static array $data;
     private static SplFileObject $responseFile;
     private static SplFileObject $accettazioneFile;
+    private static SplFileObject $archiviazioneFile;
 
     public static function setupBeforeClass(): void
     {
@@ -80,6 +81,7 @@ class RaccomandateServiceTest extends TestCase
 
         self::$responseFile = new SplFileObject(__DIR__ . '/../response.json', 'w');
         self::$accettazioneFile = new SplFileObject(__DIR__ . '/../accettazione.pdf', 'w');
+        self::$archiviazioneFile = new SplFileObject(__DIR__ . '/../archiviazione.pdf', 'w');
     }
 
     public function setUp(): void
@@ -134,5 +136,14 @@ class RaccomandateServiceTest extends TestCase
         $body = Raccomandate::downloadAccettazione($validId);
         $this->assertStringStartsWith('%PDF-', $body);
         self::$accettazioneFile->fwrite($body);
+    }
+
+    public function testDownloadArchiviazione(): void
+    {
+        $validId = '679a745c322036bb22069f64';
+        $validIdDestinatario = '679a745a322036bb22069f62';
+        $body = Raccomandate::downloadArchiviazione($validId, $validIdDestinatario);
+        $this->assertStringStartsWith('%PDF-', $body);
+        self::$archiviazioneFile->fwrite($body);
     }
 }
