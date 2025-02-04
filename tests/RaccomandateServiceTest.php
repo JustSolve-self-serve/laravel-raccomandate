@@ -95,14 +95,19 @@ class RaccomandateServiceTest extends TestCase
     public function testListRaccomandate(): void
     {
         $response = Raccomandate::listRaccomandate();
+        if (!$response) {
+            Raccomandate::createRaccomandata(self::$data);
+            $response = Raccomandate::listRaccomandate();
+        }
         $this->assertNotNull($response);
+        $this->assertTrue($response['success']);
+        $this->assertNotEmpty($response['data'][0]);
         self::$responseFile->fwrite(json_encode($response));
     }
 
     public function testCreateRaccomandata(): void
     {
-        $data = self::$data;
-        $response = Raccomandate::createRaccomandata($data);
+        $response = Raccomandate::createRaccomandata(self::$data);
         $this->assertTrue($response['success']);
     }
 
