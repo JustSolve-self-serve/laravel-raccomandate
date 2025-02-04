@@ -132,7 +132,7 @@ class RaccomandateServiceTest extends TestCase
     {
         $validId = '679a745c322036bb22069f64';
         $body = Raccomandate::downloadAccettazione($validId);
-        $this->assertNotNull($body);
+        $this->assertStringStartsWith('%PDF-', $body);
         self::$accettazioneFile->fwrite($body);
     }
 }
