@@ -35,7 +35,7 @@ class RaccomandateService
     private function headers(): array
     {
         return [
-            'Accept'       => 'application/json',
+            'Accept'       => ['application/json', 'application/pdf'],
             'Content-Type' => 'application/json',
             // If your API key is a bearer token, you might do:
             'Authorization' => 'Bearer ' . $this->apiKey,
