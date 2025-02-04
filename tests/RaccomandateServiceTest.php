@@ -109,6 +109,7 @@ class RaccomandateServiceTest extends TestCase
     {
         $response = Raccomandate::createRaccomandata(self::$data);
         $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('id', $response['data'][0]);
     }
 
     public function testGetRaccomandata(): void
