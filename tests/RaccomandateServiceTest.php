@@ -6,10 +6,13 @@ use Orchestra\Testbench\TestCase;
 use JustSolve\Raccomandate\Facades\Raccomandate;
 use JustSolve\Raccomandate\Models\MittenteCompany;
 use JustSolve\Raccomandate\Models\MittentePersona;
+use JustSolve\Raccomandate\Models\Raccomandata;
 
 class RaccomandateServiceTest extends TestCase
 {
     private static array $data;
+    private static SplFileObject $responseFile;
+    private static SplFileObject $accettazioneFile;
 
     public static function setupBeforeClass(): void
     {
@@ -74,6 +77,9 @@ class RaccomandateServiceTest extends TestCase
             'documento' => $documento,
             'opzioni' => $opzioni
         ];
+
+        self::$responseFile = new SplFileObject(__DIR__ . '/../response.json', 'w');
+        self::$accettazioneFile = new SplFileObject(__DIR__ . '/../accettazione.pdf', 'w');
     }
 
     public function setUp(): void
@@ -86,7 +92,9 @@ class RaccomandateServiceTest extends TestCase
 
     public function testListRaccomandate(): void
     {
-        $this->assertNotNull(Raccomandate::listRaccomandate());
+        $response = Raccomandate::listRaccomandate();
+        $this->assertNotNull($response);
+        self::$responseFile->fwrite(json_encode($response));
     }
 
     public function testCreateRaccomandata(): void
@@ -118,5 +126,13 @@ class RaccomandateServiceTest extends TestCase
         $this->assertTrue($newResponse['success']);
         $this->assertTrue($newResponse['data'][0]['confirmed']);
         $this->assertEquals('CONFIRMED', $newResponse['data'][0]['state']);
+    }
+
+    public function testDownloadAccettazione(): void 
+    {
+        $validId = '679a745c322036bb22069f64';
+        $body = Raccomandate::downloadAccettazione($validId);
+        $this->assertNotNull($body);
+        self::$accettazioneFile->fwrite($body);
     }
 }
