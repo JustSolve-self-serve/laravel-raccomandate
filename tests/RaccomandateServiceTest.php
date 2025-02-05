@@ -4,6 +4,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
 use JustSolve\Raccomandate\Facades\Raccomandate;
+use JustSolve\Raccomandate\Models\DestinatarioItaliano;
 use JustSolve\Raccomandate\Models\MittenteCompany;
 use JustSolve\Raccomandate\Models\MittentePersona;
 use JustSolve\Raccomandate\Models\Raccomandata;
@@ -17,49 +18,11 @@ class RaccomandateServiceTest extends TestCase
 
     public static function setupBeforeClass(): void
     {
-        $mittente = new MittenteCompany(
-            "bububello s.r.l. di bubu bello",
-            "Via",
-            "Dante Alighieri",
-            "1",
-            "Carpi",
-            "41012",
-            "MO",
-            "IT",
-            "john.doe@openapi.it"
-        );
+        $mittente = new MittenteCompany("bububello s.r.l. di bubu bello", "Via", "Dante Alighieri", "1", "Carpi", "41012", "MO", "IT", "john.doe@openapi.it");
 
-        $dest1 = json_decode(
-            '{
-                "nome": "Mario",
-                "cognome": "Rossi",
-                "co": "OPENAPI SRL",
-                "dug": "via",
-                "indirizzo": "Dante Alighieri",
-                "civico": "6",
-                "comune": "Roma",
-                "cap": "00118",
-                "provincia": "RM",
-                "nazione": "Italia"
-            }'
-        );
+        $dest1 = new DestinatarioItaliano('Margherita', 'Battaglia', 'via', 'posta', '25', 'Mirandola', '41037', 'mo', 'italia');
 
-        $dest2 = json_decode(
-            '{
-                "nome": "Mario",
-                "cognome": "Rossi",
-                "co": "OPENAPI SRL",
-                "dug": "piazza",
-                "indirizzo": "San Giovanni",
-                "civico": "6",
-                "comune": "roma",
-                "cap": "00118",
-                "provincia": "RM",
-                "nazione": "IT"
-            }'
-        );
-
-        $destinatari = [$dest1, $dest2];
+        $destinatari = [$dest1];
 
         $documento = ["example document"];
 
