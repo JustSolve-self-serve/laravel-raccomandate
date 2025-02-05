@@ -3,14 +3,10 @@
 namespace JustSolve\Raccomandate\Models;
 
 class MittentePersona extends Mittente {
-    protected string $titolo;
-    protected string $nome;
-    protected string $cognome;
 
     public function __construct(
-        string $titolo, 
-        string $nome, 
-        string $cognome,
+        protected string $nome, 
+        protected string $cognome,
         string $dug, 
         string $indirizzo, 
         string $civico, 
@@ -18,12 +14,10 @@ class MittentePersona extends Mittente {
         string $cap, 
         string $provincia, 
         string $nazione, 
-        string $email
+        string $email,
+        protected string $titolo = '' 
     ) {
         parent::__construct($dug, $indirizzo, $civico, $comune, $cap, $provincia, $nazione, $email);
-        $this->titolo = $titolo;
-        $this->nome = $nome;
-        $this->cognome = $cognome;
     }
 
     // Getters
@@ -32,7 +26,7 @@ class MittentePersona extends Mittente {
     public function getCognome(): string { return $this->cognome; }
 
     // Setters
-    public function setTitolo(string $titolo): void { $this->nome = $titolo; }
+    public function setTitolo(string $titolo): void { $this->titolo = $titolo; }
     public function setNome(string $nome): void { $this->nome = $nome; }
     public function setCognome(string $cognome): void { $this->cognome = $cognome; }
 

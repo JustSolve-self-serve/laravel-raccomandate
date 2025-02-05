@@ -3,10 +3,9 @@
 namespace JustSolve\Raccomandate\Models;
 
 class MittenteCompany extends Mittente {
-    protected string $ragioneSociale;
 
     public function __construct(
-        string $ragioneSociale,
+        protected string $ragioneSociale,
         string $dug, 
         string $indirizzo, 
         string $civico, 
@@ -17,7 +16,6 @@ class MittenteCompany extends Mittente {
         string $email
     ) {
         parent::__construct($dug, $indirizzo, $civico, $comune, $cap, $provincia, $nazione, $email);
-        $this->ragioneSociale = $ragioneSociale;
     }
 
     // Getters
