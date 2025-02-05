@@ -2,7 +2,7 @@
 
 namespace JustSolve\Raccomandate\Models;
 
-class DestinatarioItaliano extends Destinatario {
+class DestinatarioPersonaItalia extends DestinatarioPersona {
 
     public function __construct(
         string $nome, 
