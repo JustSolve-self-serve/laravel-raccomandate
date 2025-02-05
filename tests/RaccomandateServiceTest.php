@@ -4,6 +4,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
 use JustSolve\Raccomandate\Facades\Raccomandate;
+use JustSolve\Raccomandate\Models\DestinatarioCompanyItalia;
 use JustSolve\Raccomandate\Models\DestinatarioPersonaItalia;
 use JustSolve\Raccomandate\Models\MittenteCompany;
 use JustSolve\Raccomandate\Models\MittentePersona;
@@ -21,8 +22,9 @@ class RaccomandateServiceTest extends TestCase
         $mittente = new MittenteCompany("bububello s.r.l. di bubu bello", "Via", "Dante Alighieri", "1", "Carpi", "41012", "MO", "IT", "john.doe@openapi.it");
 
         $dest1 = new DestinatarioPersonaItalia('Margherita', 'Battaglia', 'via', 'posta', '25', 'Mirandola', '41037', 'mo', 'italia');
+        $dest2 = new DestinatarioCompanyItalia('BubbaGump s.r.l. di Bubba', 'via', 'fasulla', '7', 'carpi', '41012', 'mo', 'it');
 
-        $destinatari = [$dest1];
+        $destinatari = [$dest1, $dest2];
 
         $documento = ["example document"];
 
