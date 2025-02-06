@@ -122,4 +122,75 @@ class RaccomandateServiceTest extends TestCase
         $this->assertStringStartsWith('%PDF-', $body);
         self::$archiviazioneFile->fwrite($body);
     }
+
+    public function testGetArchiviazioneFromRaccomandata(): void
+    {
+        $mittente = new MittenteCompany("bububello s.r.l. di bubu bello", "Via", "Dante Alighieri", "1", "Carpi", "41012", "MO", "IT", "john.doe@openapi.it");
+        $dest1 = new DestinatarioPersonaItalia('Margherita', 'Battaglia', 'via', 'posta', '25', 'Mirandola', '41037', 'mo', 'italia');
+        $destinatari = [$dest1];
+
+        $documento = ["example document"];
+
+        $opzioni = json_decode(
+            '{
+                "fronteretro": false,
+                "colori": false,
+                "ar": true,
+                "autoconfirm": false
+            }'
+        );
+
+        $data = [
+            'mittente' => $mittente,
+            'destinatari' => $destinatari,
+            'documento' => $documento,
+            'opzioni' => $opzioni
+        ];
+
+        $response = Raccomandate::createRaccomandata($data);
+        $requestArray = [
+            'id' => $response['data'][0]['id'],
+            'destinatari' => $response['data'][0]['destinatari']
+        ];
+        $body = Raccomandate::getArchiviazioneFromRaccomandata($requestArray);
+        $this->assertStringStartsWith('%PDF-', $body);
+
+        $requestArray['destinatari'][1] = ['id' => '0'];
+        $this->expectExceptionMessage('N. destinatari diverso da 1.');
+        $body = Raccomandate::getArchiviazioneFromRaccomandata($requestArray);
+    }
+
+    public function testGetArchiviazioneFromId(): void
+    {
+        $mittente = new MittenteCompany("bububello s.r.l. di bubu bello", "Via", "Dante Alighieri", "1", "Carpi", "41012", "MO", "IT", "john.doe@openapi.it");
+        $dest1 = new DestinatarioPersonaItalia('Margherita', 'Battaglia', 'via', 'posta', '25', 'Mirandola', '41037', 'mo', 'italia');
+        $destinatari = [$dest1];
+
+        $documento = ["example document"];
+
+        $opzioni = json_decode(
+            '{
+                "fronteretro": false,
+                "colori": false,
+                "ar": true,
+                "autoconfirm": false
+            }'
+        );
+
+        $data = [
+            'mittente' => $mittente,
+            'destinatari' => $destinatari,
+            'documento' => $documento,
+            'opzioni' => $opzioni
+        ];
+
+        $response = Raccomandate::createRaccomandata($data);
+        $validId = $response['data'][0]['id'];
+        $body = Raccomandate::getArchiviazioneFromId($validId);
+        $this->assertStringStartsWith('%PDF-', $body);
+
+        $notValidId = '679a745c322036bb22069f64';
+        $this->expectExceptionMessage('N. destinatari diverso da 1.');
+        $body = Raccomandate::getArchiviazioneFromId($notValidId);
+    }
 }

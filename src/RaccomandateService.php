@@ -2,6 +2,7 @@
 
 namespace JustSolve\Raccomandate;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -133,6 +134,49 @@ class RaccomandateService
         } catch (GuzzleException $e) {
             throw $e;
         }
+    }
+
+    public function getArchiviazioneFromRaccomandata(array $raccomandata): ?string
+    {
+        if (!array_key_exists('id', $raccomandata) || !array_key_exists('destinatari', $raccomandata)) {
+            throw new Exception('Chiavi "id" e/o "destinatari" mancanti.');
+        }
+        foreach ($raccomandata['destinatari'] as $destinatario) {
+            if (!array_key_exists('id', $destinatario)) {
+                throw new Exception('Id destinatario mancante.');
+            }
+        }
+        if (count($raccomandata['destinatari']) != 1) {
+            throw new Exception('N. destinatari diverso da 1.');
+        }
+
+        $raccomandataId = $raccomandata['id'];
+        $destinatarioId = $raccomandata['destinatari'][0]['id'];
+
+        try {
+            return $this->downloadArchiviazione($raccomandataId, $destinatarioId);
+        } catch (GuzzleException $e) {
+            throw $e;
+        }
+    }
+
+    public function getArchiviazioneFromId(string $raccomandataId): ?string
+    {
+        try {
+            $raccomandata = $this->getRaccomandata($raccomandataId);
+
+            if (count($raccomandata['data']['destinatari']) != 1) {
+                throw new Exception('N. destinatari diverso da 1.');
+            }
+
+            $destinatarioId = $raccomandata['data']['destinatari'][0]['id'];
+
+            return $this->downloadArchiviazione($raccomandataId, $destinatarioId);
+        } catch (GuzzleException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw $e;
+        } 
     }
 
     /**
