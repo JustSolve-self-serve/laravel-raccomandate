@@ -160,6 +160,34 @@ class RaccomandateServiceTest extends TestCase
         $body = Raccomandate::getArchiviazioneFromRaccomandata($requestArray);
     }
 
+    public function testGetArchiviazioneFromRaccomandataMissingDestinatarioId(): void
+    {
+        $requestArray = [
+            'id' => '0',
+            'destinatari' => [['di' => 'wrong id key']]
+        ];
+        $this->expectExceptionMessage('Id destinatario mancante.');
+        Raccomandate::getArchiviazioneFromRaccomandata($requestArray);
+    }
+
+    public function testGetArchiviazioneFromRaccomandataMissingId(): void
+    {
+        $requestArray = [
+            'destinatari' => [['di' => 'wrong id key']]
+        ];
+        $this->expectExceptionMessage('Chiavi "id" e/o "destinatari" mancanti.');
+        Raccomandate::getArchiviazioneFromRaccomandata($requestArray);
+    }
+
+    public function testGetArchiviazioneFromRaccomandataMissingDestinatari(): void
+    {
+        $requestArray = [
+            'id' => '0'
+        ];
+        $this->expectExceptionMessage('Chiavi "id" e/o "destinatari" mancanti.');
+        Raccomandate::getArchiviazioneFromRaccomandata($requestArray);
+    }
+
     public function testGetArchiviazioneFromId(): void
     {
         $mittente = new MittenteCompany("bububello s.r.l. di bubu bello", "Via", "Dante Alighieri", "1", "Carpi", "41012", "MO", "IT", "john.doe@openapi.it");
