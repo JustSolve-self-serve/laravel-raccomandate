@@ -37,11 +37,14 @@ class RaccomandateServiceTest extends TestCase
             }'
         );
 
+        $callback = ['url' => 'http://127.0.0.1:8000/api/state'];
+
         self::$data = [
             'mittente' => $mittente,
             'destinatari' => $destinatari,
             'documento' => $documento,
-            'opzioni' => $opzioni
+            'opzioni' => $opzioni,
+            'callback' => $callback
         ];
     }
 
@@ -75,6 +78,7 @@ class RaccomandateServiceTest extends TestCase
         $response = Raccomandate::createRaccomandata(self::$data);
         $this->assertTrue($response['success']);
         $this->assertArrayHasKey('id', $response['data'][0]);
+        sleep(30);
     }
 
     public function testGetRaccomandata(): void
@@ -99,6 +103,7 @@ class RaccomandateServiceTest extends TestCase
         $this->assertTrue($newResponse['success']);
         $this->assertTrue($newResponse['data'][0]['confirmed']);
         $this->assertEquals('CONFIRMED', $newResponse['data'][0]['state']);
+        sleep(30);
     }
 
     public function testDownloadAccettazione(): void 
