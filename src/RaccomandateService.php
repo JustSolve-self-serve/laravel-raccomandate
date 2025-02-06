@@ -165,13 +165,12 @@ class RaccomandateService
         try {
             $raccomandata = $this->getRaccomandata($raccomandataId);
 
-            if (count($raccomandata['data']['destinatari']) != 1) {
-                throw new Exception('N. destinatari diverso da 1.');
-            }
+            $requestArray = [
+                'id' => $raccomandata['data']['id'],
+                'destinatari' => $raccomandata['data']['destinatari']
+            ];
 
-            $destinatarioId = $raccomandata['data']['destinatari'][0]['id'];
-
-            return $this->downloadArchiviazione($raccomandataId, $destinatarioId);
+            return $this->getArchiviazioneFromRaccomandata($requestArray);
         } catch (GuzzleException $e) {
             throw $e;
         } catch (Exception $e) {
