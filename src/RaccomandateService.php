@@ -164,13 +164,7 @@ class RaccomandateService
     {
         try {
             $raccomandata = $this->getRaccomandata($raccomandataId);
-
-            $requestArray = [
-                'id' => $raccomandata['data']['id'],
-                'destinatari' => $raccomandata['data']['destinatari']
-            ];
-
-            return $this->getArchiviazioneFromRaccomandata($requestArray);
+            return $this->getArchiviazioneFromRaccomandata($raccomandata['data']);
         } catch (GuzzleException $e) {
             throw $e;
         } catch (Exception $e) {
