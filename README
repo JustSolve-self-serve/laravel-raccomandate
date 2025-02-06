@@ -1,0 +1,18 @@
+Installation instructions
+Add in your composer.json
+
+"repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/JustSolve-self-serve/laravel-raccomandate"
+        }
+    ],
+
+
+command: composer require justsolve/laravel-raccomandate:dev-main
+
+da aggiungere a .env:
+RACCOMANDATE_BASE_URI=your_base_uri
+RACCOMANDATE_API_KEY=your_api_key
+
+
