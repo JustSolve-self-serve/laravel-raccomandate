@@ -1,1 +1,8 @@
-/vendor
+.env
+testbench.yaml
+vendor
+workbench
+.phpunit.result.cache
+response.json
+accettazione.pdf
+archiviazione.pdf

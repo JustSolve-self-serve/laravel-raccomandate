@@ -11,10 +11,15 @@ class RaccomandateService
     protected string $baseUri;
     protected ?string $apiKey;
 
-    public function __construct(string $baseUri, ?string $apiKey)
+    public function __construct()
     {
-        $this->baseUri = $baseUri;
-        $this->apiKey = $apiKey;
+        /*$env = require __DIR__ . '/../config/raccomandate.php';
+
+        $this->baseUri = $env['base_uri'];
+        $this->apiKey = $env['api_key'];*/
+
+        $this->baseUri = config('raccomandate.base_uri');
+        $this->apiKey = config('raccomandate.api_key');        
 
         $this->client = new Client([
             'base_uri' => $this->baseUri,
@@ -30,7 +35,7 @@ class RaccomandateService
     private function headers(): array
     {
         return [
-            'Accept'       => 'application/json',
+            'Accept'       => ['application/json', 'application/pdf'],
             'Content-Type' => 'application/json',
             // If your API key is a bearer token, you might do:
             'Authorization' => 'Bearer ' . $this->apiKey,

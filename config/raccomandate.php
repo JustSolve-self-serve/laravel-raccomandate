@@ -2,7 +2,7 @@
 
 return [
     // The base URL for the Raccomandate API
-    'base_uri' => env('RACCOMANDATE_BASE_URI', 'https://api.example.com'),
+    'base_uri' => env('RACCOMANDATE_BASE_URI', null),
 
     'api_key' => env('RACCOMANDATE_API_KEY', null),
 
