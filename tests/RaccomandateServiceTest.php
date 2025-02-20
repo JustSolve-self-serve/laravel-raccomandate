@@ -81,6 +81,15 @@ class RaccomandateServiceTest extends TestCase
         sleep(30);
     }
 
+    public function testCreateRaccomandataWithMittentePersona(): void
+    {
+        self::$data['mittente'] = new MittentePersona('Miriam', 'Fadda', 'via', 'Boccardo', '6', 'Moncalieri', '10024', 'TO', 'IT', 'info@faddastudiolegale.it', 'Avv.');
+        $response = Raccomandate::createRaccomandata(self::$data);
+        $this->assertTrue($response['success']);
+        $this->assertArrayHasKey('id', $response['data'][0]);
+        $this->assertArrayHasKey('dug', $response['data'][0]['mittente']);
+    }
+
     public function testGetRaccomandata(): void
     {
         $response = Raccomandate::createRaccomandata(self::$data);
