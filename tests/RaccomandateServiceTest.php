@@ -1,21 +1,17 @@
 <?php
 
-use GuzzleHttp\Exception\ClientException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
 use JustSolve\Raccomandate\Facades\Raccomandate;
 use JustSolve\Raccomandate\Models\DestinatarioCompanyItalia;
 use JustSolve\Raccomandate\Models\DestinatarioPersonaItalia;
 use JustSolve\Raccomandate\Models\MittenteCompany;
-use JustSolve\Raccomandate\Models\MittentePersona;
-use JustSolve\Raccomandate\Models\Raccomandata;
 
 class RaccomandateServiceTest extends TestCase
 {
     private static array $data;
-    private static SplFileObject $responseFile;
-    private static SplFileObject $accettazioneFile;
-    private static SplFileObject $archiviazioneFile;
 
     public static function setupBeforeClass(): void
     {
@@ -52,25 +48,109 @@ class RaccomandateServiceTest extends TestCase
     {
         parent::setUp();
 
-        Config::set('raccomandate.base_uri', env('RACCOMANDATE_BASE_URI', 'baba'));
-        Config::set('raccomandate.api_key', env('RACCOMANDATE_API_KEY', 'bubu'));
+        Config::set('raccomandate.base_uri', 'https://api.bubba.it/v1');
 
-        self::$responseFile = new SplFileObject(__DIR__ . '/../response.json', 'w');
-        self::$accettazioneFile = new SplFileObject(__DIR__ . '/../accettazione.pdf', 'w');
-        self::$archiviazioneFile = new SplFileObject(__DIR__ . '/../archiviazione.pdf', 'w');
+        // Fake all HTTP requests with deterministic responses based on URL
+        Http::fake(function ($request) {
+            $url = $request->url();
+            $method = strtoupper($request->method());
+
+            // Normalize to work with whatever base_uri is configured
+            // Extract path after the base segment 'raccomandate'
+            $path = $url;
+            if (($pos = strpos($url, '/raccomandate')) !== false) {
+                $path = substr($url, $pos);
+            }
+
+            // List raccomandate
+            if ($method === 'GET' && $path === '/raccomandate') {
+                return Http::response([
+                    'success' => true,
+                    'data' => [
+                        ['id' => 'id-123']
+                    ],
+                ], 200);
+            }
+
+            // Create raccomandata
+            if ($method === 'POST' && $path === '/raccomandate') {
+                return Http::response([
+                    'success' => true,
+                    'data' => [[
+                        'id' => 'id-123',
+                        'confirmed' => false,
+                        'state' => 'CREATED',
+                        'destinatari' => [['id' => 'dest-1']],
+                    ]],
+                ], 201);
+            }
+
+            // Get raccomandata details
+            if ($method === 'GET' && preg_match('#^/raccomandate/([^/]+)$#', $path, $m)) {
+                $id = $m[1];
+                if ($id === 'id-123') {
+                    return Http::response([
+                        'success' => true,
+                        'data' => [
+                            'id' => 'id-123',
+                            'destinatari' => [['id' => 'dest-1']],
+                        ],
+                    ], 200);
+                }
+                if ($id === '679a745c322036bb22069f64') {
+                    // Specific ID used in tests to trigger >1 destinatari
+                    return Http::response([
+                        'success' => true,
+                        'data' => [
+                            'id' => $id,
+                            'destinatari' => [['id' => 'd1'], ['id' => 'd2']],
+                        ],
+                    ], 200);
+                }
+                // Unknown id -> 404 to trigger RequestException via ->throw()
+                return Http::response(['message' => 'Not Found'], 404);
+            }
+
+            // Confirm raccomandata
+            if ($method === 'PATCH' && preg_match('#^/raccomandate/([^/]+)$#', $path, $m)) {
+                $id = $m[1];
+                if ($id === 'id-123') {
+                    return Http::response([
+                        'success' => true,
+                        'data' => [[
+                            'id' => 'id-123',
+                            'confirmed' => true,
+                            'state' => 'CONFIRMED',
+                        ]],
+                    ], 200);
+                }
+                return Http::response(['message' => 'Not Found'], 404);
+            }
+
+            // Download accettazione
+            if ($method === 'GET' && preg_match('#^/raccomandate/[^/]+/accettazione$#', $path)) {
+                return Http::response('%PDF-FAKE-ACCETTAZIONE', 200, ['Content-Type' => 'application/pdf']);
+            }
+
+            // Download archiviazione
+            if ($method === 'GET' && preg_match('#^/raccomandate/[^/]+/destinatari/[^/]+/archiviazione$#', $path)) {
+                return Http::response('%PDF-FAKE-ARCHIVIAZIONE', 200, ['Content-Type' => 'application/pdf']);
+            }
+
+            // Fallback
+            return Http::response(['message' => 'Unhandled fake endpoint'], 500);
+        });
     }
 
     public function testListRaccomandate(): void
     {
         $response = Raccomandate::listRaccomandate();
-        if (!$response) {
-            Raccomandate::createRaccomandata(self::$data);
-            $response = Raccomandate::listRaccomandate();
-        }
+        
         $this->assertNotNull($response);
         $this->assertTrue($response['success']);
         $this->assertNotEmpty($response['data'][0]);
-        self::$responseFile->fwrite(json_encode($response));
+        $this->assertArrayHasKey('id', $response['data'][0]);
+        $this->assertEquals('id-123', $response['data'][0]['id']);
     }
 
     public function testCreateRaccomandata(): void
@@ -78,82 +158,49 @@ class RaccomandateServiceTest extends TestCase
         $response = Raccomandate::createRaccomandata(self::$data);
         $this->assertTrue($response['success']);
         $this->assertArrayHasKey('id', $response['data'][0]);
-        sleep(30);
+        $this->assertEquals('id-123', $response['data'][0]['id']);
     }
 
     public function testGetRaccomandata(): void
     {
-        $response = Raccomandate::createRaccomandata(self::$data);
-        $validId = $response['data'][0]['id'];
+        $validId = 'id-123';
         $this->assertTrue(Raccomandate::getRaccomandata($validId)['success']);
+        $this->assertEquals($validId, Raccomandate::getRaccomandata($validId)['data']['id']);
         
         $nullId = $validId . 'bubba';
-        $this->expectException(ClientException::class);
+        $this->expectException(RequestException::class);
         Raccomandate::getRaccomandata($nullId);
     }
 
     public function testConfirmRaccomandata(): void 
     {
-        $response = Raccomandate::createRaccomandata(self::$data);
-        $this->assertFalse($response['data'][0]['confirmed']);
-        $this->assertNotEquals('CONFIRMED', $response['data'][0]['state']);
-
-        $validId = $response['data'][0]['id'];
+        $validId = 'id-123';
         $newResponse = Raccomandate::confirmRaccomandata($validId);
         $this->assertTrue($newResponse['success']);
         $this->assertTrue($newResponse['data'][0]['confirmed']);
         $this->assertEquals('CONFIRMED', $newResponse['data'][0]['state']);
-        sleep(30);
     }
 
     public function testDownloadAccettazione(): void 
     {
-        $validId = '679a745c322036bb22069f64';
-        $body = Raccomandate::downloadAccettazione($validId);
-        $this->assertStringStartsWith('%PDF-', $body);
-        self::$accettazioneFile->fwrite($body);
+        $body = Raccomandate::downloadAccettazione('id-123');
+        $this->assertEquals('%PDF-FAKE-ACCETTAZIONE', $body);
     }
 
     public function testDownloadArchiviazione(): void
     {
-        $validId = '679a745c322036bb22069f64';
-        $validIdDestinatario = '679a745a322036bb22069f62';
-        $body = Raccomandate::downloadArchiviazione($validId, $validIdDestinatario);
-        $this->assertStringStartsWith('%PDF-', $body);
-        self::$archiviazioneFile->fwrite($body);
+        $body = Raccomandate::downloadArchiviazione('id-123', '679a745a322036bb22069f62');
+        $this->assertEquals('%PDF-FAKE-ARCHIVIAZIONE', $body);
     }
 
     public function testGetArchiviazioneFromRaccomandata(): void
     {
-        $mittente = new MittenteCompany("bububello s.r.l. di bubu bello", "Via", "Dante Alighieri", "1", "Carpi", "41012", "MO", "IT", "john.doe@openapi.it");
-        $dest1 = new DestinatarioPersonaItalia('Margherita', 'Battaglia', 'via', 'posta', '25', 'Mirandola', '41037', 'mo', 'italia');
-        $destinatari = [$dest1];
-
-        $documento = ["example document"];
-
-        $opzioni = json_decode(
-            '{
-                "fronteretro": false,
-                "colori": false,
-                "ar": true,
-                "autoconfirm": false
-            }'
-        );
-
-        $data = [
-            'mittente' => $mittente,
-            'destinatari' => $destinatari,
-            'documento' => $documento,
-            'opzioni' => $opzioni
-        ];
-
-        $response = Raccomandate::createRaccomandata($data);
         $requestArray = [
-            'id' => $response['data'][0]['id'],
-            'destinatari' => $response['data'][0]['destinatari']
+            'id' => 'id-123',
+            'destinatari' => [['id' => '679a745a322036bb22069f62']]
         ];
         $body = Raccomandate::getArchiviazioneFromRaccomandata($requestArray);
-        $this->assertStringStartsWith('%PDF-', $body);
+        $this->assertEquals('%PDF-FAKE-ARCHIVIAZIONE', $body);
 
         $requestArray['destinatari'][1] = ['id' => '0'];
         $this->expectExceptionMessage('N. destinatari diverso da 1.');
@@ -190,32 +237,8 @@ class RaccomandateServiceTest extends TestCase
 
     public function testGetArchiviazioneFromId(): void
     {
-        $mittente = new MittenteCompany("bububello s.r.l. di bubu bello", "Via", "Dante Alighieri", "1", "Carpi", "41012", "MO", "IT", "john.doe@openapi.it");
-        $dest1 = new DestinatarioPersonaItalia('Margherita', 'Battaglia', 'via', 'posta', '25', 'Mirandola', '41037', 'mo', 'italia');
-        $destinatari = [$dest1];
-
-        $documento = ["example document"];
-
-        $opzioni = json_decode(
-            '{
-                "fronteretro": false,
-                "colori": false,
-                "ar": true,
-                "autoconfirm": false
-            }'
-        );
-
-        $data = [
-            'mittente' => $mittente,
-            'destinatari' => $destinatari,
-            'documento' => $documento,
-            'opzioni' => $opzioni
-        ];
-
-        $response = Raccomandate::createRaccomandata($data);
-        $validId = $response['data'][0]['id'];
-        $body = Raccomandate::getArchiviazioneFromId($validId);
-        $this->assertStringStartsWith('%PDF-', $body);
+        $body = Raccomandate::getArchiviazioneFromId('id-123');
+        $this->assertEquals('%PDF-FAKE-ARCHIVIAZIONE', $body);
 
         $notValidId = '679a745c322036bb22069f64';
         $this->expectExceptionMessage('N. destinatari diverso da 1.');

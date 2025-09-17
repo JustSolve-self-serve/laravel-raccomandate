@@ -3,30 +3,21 @@
 namespace JustSolve\Raccomandate;
 
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 
 class RaccomandateService
 {
-    protected Client $client;
+    protected HttpFactory $http;
     protected string $baseUri;
     protected ?string $apiKey;
 
-    public function __construct()
+    public function __construct(HttpFactory $http)
     {
-        /*$env = require __DIR__ . '/../config/raccomandate.php';
-
-        $this->baseUri = $env['base_uri'];
-        $this->apiKey = $env['api_key'];*/
-
         $this->baseUri = config('raccomandate.base_uri');
-        $this->apiKey = config('raccomandate.api_key');        
-
-        $this->client = new Client([
-            'base_uri' => $this->baseUri,
-            'timeout'  => 30.0,
-            'verify'   => false,
-        ]);
+        $this->apiKey = config('raccomandate.api_key');
+        $this->http = $http;
     }
 
     /**
@@ -36,13 +27,27 @@ class RaccomandateService
     private function headers(): array
     {
         return [
-            'Accept'       => ['application/json', 'application/pdf'],
+            'Accept'       => 'application/json, application/pdf',
             'Content-Type' => 'application/json',
-            // If your API key is a bearer token, you might do:
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            // or if it is a custom header:
-            // 'x-api-key' => $this->apiKey,
         ];
+    }
+
+    /**
+     * Build a configured PendingRequest for the API.
+     */
+    private function request(): PendingRequest
+    {
+        $request = $this->http
+            ->baseUrl($this->baseUri)
+            ->withHeaders($this->headers())
+            ->timeout(30)
+            ->withoutVerifying();
+
+        if (!empty($this->apiKey)) {
+            $request = $request->withToken($this->apiKey);
+        }
+
+        return $request;
     }
 
     /**
@@ -51,14 +56,10 @@ class RaccomandateService
     public function listRaccomandate(): array | null
     {
         try {
-            $response = $this->client->get('/raccomandate', [
-                'headers' => $this->headers(),
-            ]);
-
-            return json_decode($response->getBody(), true);
-        } catch (GuzzleException $e) {
-            // Here you could throw a custom exception or handle it
-            throw $e;
+            $response = $this->request()->get('/raccomandate')->throw();
+            return $response->json();
+        } catch (RequestException $e) {
+            throw $e; // Preserve failure for caller/tests
         }
     }
 
@@ -69,13 +70,9 @@ class RaccomandateService
     public function createRaccomandata(array $data): array
     {
         try {
-            $response = $this->client->post('/raccomandate', [
-                'headers' => $this->headers(),
-                'json'    => $data,
-            ]);
-
-            return json_decode($response->getBody(), true);
-        } catch (GuzzleException $e) {
+            $response = $this->request()->post('/raccomandate', $data)->throw();
+            return $response->json();
+        } catch (RequestException $e) {
             throw $e;
         }
     }
@@ -86,13 +83,9 @@ class RaccomandateService
     public function getRaccomandata(string $raccomandataId, array $queryParams = []): array
     {
         try {
-            $response = $this->client->get("/raccomandate/{$raccomandataId}", [
-                'headers' => $this->headers(),
-                'query'   => $queryParams,
-            ]);
-
-            return json_decode($response->getBody(), true);
-        } catch (GuzzleException $e) {
+            $response = $this->request()->get("/raccomandate/{$raccomandataId}", $queryParams)->throw();
+            return $response->json();
+        } catch (RequestException $e) {
             throw $e;
         }
     }
@@ -103,13 +96,12 @@ class RaccomandateService
     public function confirmRaccomandata(string $raccomandataId, bool $confirmed = true): array
     {
         try {
-            $response = $this->client->patch("/raccomandate/{$raccomandataId}", [
-                'headers' => $this->headers(),
-                'json'    => ['confirmed' => $confirmed],
-            ]);
+            $response = $this->request()->patch("/raccomandate/{$raccomandataId}", [
+                'confirmed' => $confirmed,
+            ])->throw();
 
-            return json_decode($response->getBody(), true);
-        } catch (GuzzleException $e) {
+            return $response->json();
+        } catch (RequestException $e) {
             throw $e;
         }
     }
@@ -122,16 +114,9 @@ class RaccomandateService
     public function downloadArchiviazione(string $raccomandataId, string $destinatarioId): ?string
     {
         try {
-            $response = $this->client->get("/raccomandate/{$raccomandataId}/destinatari/{$destinatarioId}/archiviazione", [
-                'headers' => $this->headers(),
-                // Might need to set 'stream' => true if you want to handle it as a stream
-            ]);
-
-            // If the response is indeed a PDF (binary), you can do something like:
-            // return $response->getBody()->getContents();
-            // Or you might just return it raw to the caller.
-            return $response->getBody()->getContents();
-        } catch (GuzzleException $e) {
+            $response = $this->request()->get("/raccomandate/{$raccomandataId}/destinatari/{$destinatarioId}/archiviazione")->throw();
+            return $response->body();
+        } catch (RequestException $e) {
             throw $e;
         }
     }
@@ -153,11 +138,7 @@ class RaccomandateService
         $raccomandataId = $raccomandata['id'];
         $destinatarioId = $raccomandata['destinatari'][0]['id'];
 
-        try {
-            return $this->downloadArchiviazione($raccomandataId, $destinatarioId);
-        } catch (GuzzleException $e) {
-            throw $e;
-        }
+        return $this->downloadArchiviazione($raccomandataId, $destinatarioId);
     }
 
     public function getArchiviazioneFromId(string $raccomandataId): ?string
@@ -165,11 +146,9 @@ class RaccomandateService
         try {
             $raccomandata = $this->getRaccomandata($raccomandataId);
             return $this->getArchiviazioneFromRaccomandata($raccomandata['data']);
-        } catch (GuzzleException $e) {
-            throw $e;
         } catch (Exception $e) {
             throw $e;
-        } 
+        }
     }
 
     /**
@@ -179,12 +158,9 @@ class RaccomandateService
     public function downloadAccettazione(string $raccomandataId): ?string
     {
         try {
-            $response = $this->client->get("/raccomandate/{$raccomandataId}/accettazione", [
-                'headers' => $this->headers(),
-            ]);
-
-            return $response->getBody()->getContents();
-        } catch (GuzzleException $e) {
+            $response = $this->request()->get("/raccomandate/{$raccomandataId}/accettazione")->throw();
+            return $response->body();
+        } catch (RequestException $e) {
             throw $e;
         }
     }

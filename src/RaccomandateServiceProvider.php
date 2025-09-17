@@ -2,6 +2,7 @@
 
 namespace JustSolve\Raccomandate;
 
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\ServiceProvider;
 
 class RaccomandateServiceProvider extends ServiceProvider
@@ -11,9 +12,9 @@ class RaccomandateServiceProvider extends ServiceProvider
         // Merge and publish config
         $this->mergeConfigFrom(__DIR__ . '/../config/raccomandate.php', 'raccomandate');
 
-        // Bind our service into the service container
+        // Bind our service into the service container with auto-injected HTTP client
         $this->app->singleton(RaccomandateService::class, function ($app) {
-            return new RaccomandateService();
+            return new RaccomandateService($app->make(HttpFactory::class));
         });
     }
 
