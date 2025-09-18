@@ -11,8 +11,9 @@ Add in your composer.json
 
 command: composer require justsolve/laravel-raccomandate:dev-main
 
-da aggiungere a .env:
+To use this library with your app, add to your .env:
 RACCOMANDATE_BASE_URI=your_base_uri
 RACCOMANDATE_API_KEY=your_api_key
 
-
+For test running, set your RACCOMANDATA_BASE_URI and RACCOMANDATA_API_KEY directly into the Config::set calls within the ApiCallsTest.
+Otherwise, if you want to avoid exposing your testing env variables, create an .env into vendor/orchestra/testbench-core/laravel and set them there.
