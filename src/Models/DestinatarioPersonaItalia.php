@@ -7,40 +7,33 @@ class DestinatarioPersonaItalia extends DestinatarioPersona {
     public function __construct(
         string $nome, 
         string $cognome,
-        protected string $dug, 
-        protected string $indirizzo, 
-        protected string $civico, 
-        protected string $comune, 
-        protected string $cap, 
-        protected string $provincia, 
-        protected string $nazione, 
-        protected string $titolo = '', 
-        protected string $co = ''
+        protected string $dug,
+        string $indirizzo,
+        protected string $civico,
+        string $comune,
+        string $cap,
+        protected string $provincia,
+        string $nazione,
+        string $titolo = '',
+        protected string $co = '',
+        protected string $dettaglio_immobile = '',
     ) {
-        parent::__construct($nome, $cognome);
+        parent::__construct($nome, $cognome, $indirizzo, $comune, $cap, $nazione, $titolo);
     }
 
-    // Getters
+    // Getters for unique properties
     public function getDug(): string { return $this->dug; }
-    public function getIndirizzo(): string { return $this->indirizzo; }
     public function getCivico(): string { return $this->civico; }
-    public function getComune(): string { return $this->comune; }
-    public function getCap(): string { return $this->cap; }
     public function getProvincia(): string { return $this->provincia; }
-    public function getNazione(): string { return $this->nazione; }
-    public function getTitolo(): string { return $this->titolo; }
     public function getCo(): string { return $this->co; }
+    public function getDettaglioImmobile(): string { return $this->dettaglio_immobile; }
 
-    // Setters
+    // Setters for unique properties
     public function setDug(string $dug): void { $this->dug = $dug; }
-    public function setIndirizzo(string $indirizzo): void { $this->indirizzo = $indirizzo; }
     public function setCivico(string $civico): void { $this->civico = $civico; }
-    public function setComune(string $comune): void { $this->comune = $comune; }
-    public function setCap(string $cap): void { $this->cap = $cap; }
     public function setProvincia(string $provincia): void { $this->provincia = $provincia; }
-    public function setNazione(string $nazione): void { $this->nazione = $nazione; }
-    public function setTitolo(string $titolo): void { $this->titolo = $titolo; }
     public function setCo(string $co): void { $this->co = $co; }
+    public function setDettaglioImmobile(string $dettaglio_immobile): void { $this->dettaglio_immobile = $dettaglio_immobile; }
 
     public function jsonSerialize(): mixed
     {
@@ -52,6 +45,7 @@ class DestinatarioPersonaItalia extends DestinatarioPersona {
             'dug' => $this->dug,
             'indirizzo' => $this->indirizzo,
             'civico' => $this->civico,
+            'dettaglio_immobile' => $this->dettaglio_immobile,
             'comune' => $this->comune,
             'cap' => $this->cap,
             'provincia' => $this->provincia,

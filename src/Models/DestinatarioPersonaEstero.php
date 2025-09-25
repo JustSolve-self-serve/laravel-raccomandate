@@ -7,28 +7,14 @@ class DestinatarioPersonaEstero extends DestinatarioPersona {
     public function __construct(
         string $nome, 
         string $cognome,
-        protected string $indirizzo, 
-        protected string $comune, 
-        protected string $cap,
-        protected string $nazione, 
-        protected string $titolo = '',
+        string $indirizzo,
+        string $comune,
+        string $cap,
+        string $nazione,
+        string $titolo = ''
     ) {
-        parent::__construct($nome, $cognome);
+        parent::__construct($nome, $cognome, $indirizzo, $comune, $cap, $nazione, $titolo);
     }
-
-    // Getters
-    public function getIndirizzo(): string { return $this->indirizzo; }
-    public function getComune(): string { return $this->comune; }
-    public function getCap(): string { return $this->cap; }
-    public function getNazione(): string { return $this->nazione; }
-    public function getTitolo(): string { return $this->titolo; }
-
-    // Setters
-    public function setIndirizzo(string $indirizzo): void { $this->indirizzo = $indirizzo; }
-    public function setComune(string $comune): void { $this->comune = $comune; }
-    public function setCap(string $cap): void { $this->cap = $cap; }
-    public function setNazione(string $nazione): void { $this->nazione = $nazione; }
-    public function setTitolo(string $titolo): void { $this->titolo = $titolo; }
 
     public function jsonSerialize(): mixed
     {
