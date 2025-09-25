@@ -2,6 +2,8 @@
 
 namespace JustSolve\Raccomandate\Models;
 
+use InvalidArgumentException;
+
 class DestinatarioPersonaItalia extends DestinatarioPersona {
 
     public function __construct(
@@ -19,6 +21,32 @@ class DestinatarioPersonaItalia extends DestinatarioPersona {
         protected string $dettaglio_immobile = '',
     ) {
         parent::__construct($nome, $cognome, $indirizzo, $comune, $cap, $nazione, $titolo);
+    }
+
+    public static function create(array $properties): static
+    {
+        $requiredFields = ['nome', 'cognome', 'dug', 'indirizzo', 'civico', 'comune', 'cap', 'provincia', 'nazione'];
+
+        foreach ($requiredFields as $field) {
+            if (!array_key_exists($field, $properties)) {
+                throw new InvalidArgumentException(sprintf("Missing required field '%s' for %s", $field, static::class));
+            }
+        }
+
+        return new static(
+            $properties['nome'],
+            $properties['cognome'],
+            $properties['dug'],
+            $properties['indirizzo'],
+            $properties['civico'],
+            $properties['comune'],
+            $properties['cap'],
+            $properties['provincia'],
+            $properties['nazione'],
+            $properties['titolo'] ?? '',
+            $properties['co'] ?? '',
+            $properties['dettaglio_immobile'] ?? ''
+        );
     }
 
     // Getters for unique properties

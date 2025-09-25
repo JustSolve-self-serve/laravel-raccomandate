@@ -2,6 +2,7 @@
 
 namespace JustSolve\Raccomandate\Models;
 
-use JsonSerializable;
-
-interface Destinatario extends JsonSerializable {}
+interface Destinatario extends \JsonSerializable
+{
+    public static function create(array $properties): static;
+}
