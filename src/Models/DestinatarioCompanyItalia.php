@@ -56,4 +56,28 @@ class DestinatarioCompanyItalia extends DestinatarioCompany {
             'nazione' => $this->nazione
         ];
     }
+
+    public static function create(array $properties): static
+    {
+        $requiredFields = ['ragioneSociale', 'dug', 'indirizzo', 'civico', 'comune', 'cap', 'provincia', 'nazione'];
+
+        foreach ($requiredFields as $field) {
+            if (!array_key_exists($field, $properties)) {
+                throw new \InvalidArgumentException(sprintf("Missing required field '%s' for %s", $field, static::class));
+            }
+        }
+
+        return new static(
+            $properties['ragioneSociale'],
+            $properties['dug'],
+            $properties['indirizzo'],
+            $properties['civico'],
+            $properties['comune'],
+            $properties['cap'],
+            $properties['provincia'],
+            $properties['nazione'],
+            $properties['titolo'] ?? '',
+            $properties['co'] ?? ''
+        );
+    }
 }
